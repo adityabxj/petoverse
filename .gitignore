@@ -1,0 +1,24 @@
+### Maven ###
+target/
+.mvn/
+
+### IntelliJ ###
+.idea/
+*.iml
+out/
+
+### Node/Angular ###
+node_modules/
+dist/
+.angular/cache/
+
+### Logs ###
+*.log
+logs/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Env files ###
+*.env
