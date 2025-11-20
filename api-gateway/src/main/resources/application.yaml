@@ -1,3 +1,40 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+
+        - id: auth-service
+          uri: http://auth-service:8080
+          predicates:
+            - Path=/auth/**
+
+        - id: user-service
+          uri: http://user-service:8080
+          predicates:
+            - Path=/users/**
+
+        - id: pet-service
+          uri: http://pet-service:8080
+          predicates:
+            - Path=/pets/**
+
+        - id: vet-service
+          uri: http://vet-service:8080
+          predicates:
+            - Path=/vets/**
+
+        - id: record-service
+          uri: http://record-service:8080
+          predicates:
+            - Path=/records/**
+
+        - id: appointment-service
+          uri: http://appointment-service:8080
+          predicates:
+            - Path=/appointments/**

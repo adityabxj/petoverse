@@ -1,0 +1,143 @@
+services:
+
+  # ---------- POSTGRES ----------
+  petoverse-postgres:
+    image: postgres:16
+    container_name: petoverse-postgres
+    environment:
+      POSTGRES_DB: petoverse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  # ---------- AUTH SERVICE ----------
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8080"
+
+
+  # ---------- USER SERVICE ----------
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8082:8080"
+
+
+  # ---------- PET SERVICE ----------
+  pet-service:
+    build: ./pet-service
+    container_name: pet-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8083:8080"
+
+
+  # ---------- VET SERVICE ----------
+  vet-service:
+    build: ./vet-service
+    container_name: vet-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8084:8080"
+
+
+  # ---------- RECORD SERVICE ----------
+  record-service:
+    build: ./record-service
+    container_name: record-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8085:8080"
+
+
+  # ---------- APPOINTMENT SERVICE ----------
+  appointment-service:
+    build: ./appointment-service
+    container_name: appointment-service
+    depends_on:
+      petoverse-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://petoverse-postgres:5432/petoverse
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8086:8080"
+
+
+  # ---------- API GATEWAY ----------
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      pet-service:
+        condition: service_started
+      vet-service:
+        condition: service_started
+      record-service:
+        condition: service_started
+      appointment-service:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+
+
+# ---------- VOLUMES ----------
+volumes:
+  postgres_data:
