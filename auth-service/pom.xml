@@ -8,7 +8,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.7</version>
+		<version>3.4.3</version>
+		<relativePath/>
 	</parent>
 
 	<groupId>com.petoverse</groupId>
@@ -18,7 +19,7 @@
 	<description>Authentication Module for Petoverse</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
@@ -60,16 +61,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- FLYWAY -->
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-database-postgresql</artifactId>
-		</dependency>
-
 		<!-- JWT AUTH -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -89,13 +80,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- LOMBOK -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-
 		<!-- TEST TOOLS (OPTIONAL) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,29 +93,30 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
-
-			<!-- Enable Lombok annotation processing -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
+					<argLine>-Duser.timezone=UTC</argLine>
 				</configuration>
 			</plugin>
-
 			<!-- Spring Boot Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<jvmArguments>-Duser.timezone=UTC</jvmArguments>
+				</configuration>
 			</plugin>
 
 		</plugins>
