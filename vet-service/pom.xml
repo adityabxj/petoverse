@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.7</version>
+		<version>3.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.petoverse</groupId>
-	<artifactId>vetservice</artifactId>
+	<artifactId>vet-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>vetservice</name>
-	<description>Vet Module for Petoverse</description>
+	<name>vet-service</name>
+	<description>Authentication Module for Petoverse</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

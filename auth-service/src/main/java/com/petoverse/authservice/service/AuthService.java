@@ -2,12 +2,17 @@ package com.petoverse.authservice.service;
 
 import com.petoverse.authservice.dto.LoginRequest;
 import com.petoverse.authservice.dto.LoginResponse;
+import com.petoverse.authservice.dto.RegisterRequest;
+import com.petoverse.authservice.dto.RegisterResponse;
 import com.petoverse.authservice.entity.User;
 import com.petoverse.authservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -17,7 +22,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // ✅ Inject PasswordEncoder (DO NOT create manually)
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -45,5 +49,25 @@ public class AuthService {
                 "Login successful",
                 user.getRole()
         );
+    }
+
+    public RegisterResponse register(RegisterRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
+        user.setStatus("ACTIVE");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        return new RegisterResponse("User registered successfully", user.getEmail());
     }
 }
