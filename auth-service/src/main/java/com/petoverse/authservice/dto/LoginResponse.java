@@ -2,16 +2,28 @@ package com.petoverse.authservice.dto;
 
 public class LoginResponse {
 
-    private String message;
+    private String accessToken;
+    private String tokenType;
+    private long expiresIn;
     private String role;
 
-    public LoginResponse(String message, String role) {
-        this.message = message;
+    public LoginResponse(String accessToken, String tokenType, long expiresIn, String role) {
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.expiresIn = expiresIn;
         this.role = role;
     }
 
-    public String getMessage() {
-        return message;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public long getExpiresIn() {
+        return expiresIn;
     }
 
     public String getRole() {

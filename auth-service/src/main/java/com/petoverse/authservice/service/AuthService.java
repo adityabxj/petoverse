@@ -6,6 +6,8 @@ import com.petoverse.authservice.dto.RegisterRequest;
 import com.petoverse.authservice.dto.RegisterResponse;
 import com.petoverse.authservice.entity.User;
 import com.petoverse.authservice.repository.UserRepository;
+import com.petoverse.authservice.security.JwtService;
+import com.petoverse.authservice.security.TokenBlacklistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +23,17 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public AuthService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService,
+                       TokenBlacklistService tokenBlacklistService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -38,6 +46,11 @@ public class AuthService {
                     return new IllegalArgumentException("Invalid email or password");
                 });
 
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            log.warn("Inactive user login attempt: {}", request.getEmail());
+            throw new IllegalArgumentException("User account is inactive");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             log.warn("Invalid password for user: {}", request.getEmail());
             throw new IllegalArgumentException("Invalid email or password");
@@ -46,7 +59,9 @@ public class AuthService {
         log.info("Login successful for user: {}", request.getEmail());
 
         return new LoginResponse(
-                "Login successful",
+                jwtService.generateToken(user),
+                "Bearer",
+                jwtService.getExpirationSeconds(),
                 user.getRole()
         );
     }
@@ -69,5 +84,15 @@ public class AuthService {
         userRepository.save(user);
 
         return new RegisterResponse("User registered successfully", user.getEmail());
+    }
+
+    public void logout(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
+        }
+
+        String token = authorizationHeader.substring(7);
+        tokenBlacklistService.blacklist(token, jwtService.extractExpiration(token));
+        log.info("User logged out and token revoked");
     }
 }
